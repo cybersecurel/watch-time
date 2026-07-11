@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WatchTime - Boost Your Channel</title>
+    <style>
+        :root { --accent: #ff0000; --bg: #0f0f0f; --text: #ffffff; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; text-align: center; }
+        .card { background: #1e1e1e; padding: 30px; border-radius: 12px; margin-top: 20px; }
+        input, button { padding: 12px; margin: 10px; border-radius: 6px; border: none; }
+        button { background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        iframe { width: 100%; height: 150px; border: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>WatchTime Analytics</h1>
+    <div id="login-section" class="card">
+        <p>Login with Google to sync your YouTube Analytics</p>
+        <button id="login-btn" onclick="simulateLogin()">Login with Google</button>
+    </div>
+
+    <div id="app-section" class="card" style="display:none;">
+        <h2 id="user-greeting">Welcome, User</h2>
+        <input type="text" id="video-url" placeholder="Paste YouTube Video URL">
+        <input type="number" id="tab-count" placeholder="Number of tabs (e.g. 5)" min="1" max="20">
+        <button onclick="startBoosting()">Start Boosting</button>
+        <div id="video-grid" class="grid"></div>
+    </div>
+</div>
+
+<script>
+    // Simulate OAuth flow
+    function simulateLogin() {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('app-section').style.display = 'block';
+        console.log("Accessing YouTube Data API...");
+    }
+
+    function startBoosting() {
+        const url = document.getElementById('video-url').value;
+        const count = document.getElementById('tab-count').value;
+        const grid = document.getElementById('video-grid');
+        grid.innerHTML = '';
+
+        // Extract Video ID
+        const videoId = url.split('v=')[1]?.substring(0, 11) || 'dQw4w9WgXcQ';
+
+        for (let i = 0; i < count; i++) {
+            const wrapper = document.createElement('div');
+            // Auto-play, auto-mute, loop logic via YouTube embed parameters
+            wrapper.innerHTML = `
+                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}" 
+                        allow="autoplay; encrypted-media" allowfullscreen>
+                </iframe>
+            `;
+            grid.appendChild(wrapper);
+        }
+    }
+</script>
+
+</body>
+</html>
