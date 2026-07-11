@@ -3,63 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WatchTime - Boost Your Channel</title>
+    <title>Application Dashboard</title>
     <style>
-        :root { --accent: #ff0000; --bg: #0f0f0f; --text: #ffffff; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; text-align: center; }
-        .card { background: #1e1e1e; padding: 30px; border-radius: 12px; margin-top: 20px; }
-        input, button { padding: 12px; margin: 10px; border-radius: 6px; border: none; }
-        button { background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        iframe { width: 100%; height: 150px; border: none; }
+        :root {
+            --bg-primary: #121212;
+            --bg-surface: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --color-primary: #007bff;
+            --color-primary-hover: #0056b3;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .auth-container {
+            background-color: var(--bg-surface);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-header h2 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+
+        .auth-header p {
+            color: var(--text-secondary);
+            margin: 0 0 24px 0;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            background-color: #2a2a2a;
+            color: var(--text-primary);
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--color-primary-hover);
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .auth-toggle a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>WatchTime Analytics</h1>
-    <div id="login-section" class="card">
-        <p>Login with Google to sync your YouTube Analytics</p>
-        <button id="login-btn" onclick="simulateLogin()">Login with Google</button>
+<div class="auth-container">
+    <div class="auth-header">
+        <h2 id="form-title">Sign In</h2>
+        <p id="form-subtitle">Access your video management dashboard</p>
     </div>
 
-    <div id="app-section" class="card" style="display:none;">
-        <h2 id="user-greeting">Welcome, User</h2>
-        <input type="text" id="video-url" placeholder="Paste YouTube Video URL">
-        <input type="number" id="tab-count" placeholder="Number of tabs (e.g. 5)" min="1" max="20">
-        <button onclick="startBoosting()">Start Boosting</button>
-        <div id="video-grid" class="grid"></div>
+    <form id="auth-form" onsubmit="handleAuth(event)">
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" required autocomplete="username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-submit" id="submit-btn">Sign In</button>
+    </form>
+
+    <div class="auth-toggle">
+        <span id="toggle-text">Don't have an account?</span>
+        <a href="#" id="toggle-link" onclick="toggleMode(event)">Sign Up</a>
     </div>
 </div>
 
 <script>
-    // Simulate OAuth flow
-    function simulateLogin() {
-        document.getElementById('login-section').style.display = 'none';
-        document.getElementById('app-section').style.display = 'block';
-        console.log("Accessing YouTube Data API...");
+    let isSignUp = false;
+
+    function toggleMode(e) {
+        e.preventDefault();
+        isSignUp = !isSignUp;
+        
+        const title = document.getElementById('form-title');
+        const subtitle = document.getElementById('form-subtitle');
+        const submitBtn = document.getElementById('submit-btn');
+        const toggleText = document.getElementById('toggle-text');
+        const toggleLink = document.getElementById('toggle-link');
+
+        if (isSignUp) {
+            title.textContent = "Create Account";
+            subtitle.textContent = "Sign up to start managing playlists";
+            submitBtn.textContent = "Sign Up";
+            toggleText.textContent = "Already have an account?";
+            toggleLink.textContent = "Sign In";
+        } else {
+            title.textContent = "Sign In";
+            subtitle.textContent = "Access your video management dashboard";
+            submitBtn.textContent = "Sign In";
+            toggleText.textContent = "Don't have an account?";
+            toggleLink.textContent = "Sign Up";
+        }
     }
 
-    function startBoosting() {
-        const url = document.getElementById('video-url').value;
-        const count = document.getElementById('tab-count').value;
-        const grid = document.getElementById('video-grid');
-        grid.innerHTML = '';
-
-        // Extract Video ID
-        const videoId = url.split('v=')[1]?.substring(0, 11) || 'dQw4w9WgXcQ';
-
-        for (let i = 0; i < count; i++) {
-            const wrapper = document.createElement('div');
-            // Auto-play, auto-mute, loop logic via YouTube embed parameters
-            wrapper.innerHTML = `
-                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}" 
-                        allow="autoplay; encrypted-media" allowfullscreen>
-                </iframe>
-            `;
-            grid.appendChild(wrapper);
-        }
+    function handleAuth(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        // In a real application, this data would be securely sent to a backend API via fetch()
+        console.log("Authentication requested for:", email);
     }
 </script>
 
